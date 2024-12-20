@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 1000px;
+        width: 100%;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      input {
+        padding: 10px;
+        font-size: 16px;
+        margin: 10px;
+        width: 250px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .columns {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+
+      .column {
+        width: 30%;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+      }
+
+      h2 {
+        font-size: 18px;
+        color: #333;
+      }
+
+      p {
+        font-size: 16px;
+        color: #333;
+      }
+
+      .flashcard-container {
+        text-align: center;
+        width: 400px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+      }
+
+      .flashcard {
+        margin: 20px;
+        padding: 20px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .flashcard .front,
+      .flashcard .back {
+        display: none;
+      }
+
+      .flashcard.show-front .front,
+      .flashcard.show-back .back {
+        display: block;
+      }
+
+      .buttons {
+        margin-top: 20px;
+      }
+
+      .buttons button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+        margin: 10px;
+      }
+
+      .buttons button:hover {
+        background-color: #45a049;
+      }
+
+      .back-button {
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        background-color: #ff5733;
+        color: white;
+        border-radius: 5px;
+      }
+
+      .back-button:hover {
+        background-color: #ff3300;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Trang chính -->
+    <div class="container" id="main-page">
+      <h1>Học Lặp Lại Ngắt Quãng</h1>
+
+      <input type="text" id="vocab-input" placeholder="Nhập từ vựng..." />
+      <input
+        type="text"
+        id="meaning-input"
+        placeholder="Nhập nghĩa từ vựng..."
+      />
+      <button onclick="addVocabulary()">Thêm từ vựng</button>
+
+      <div class="columns">
+        <div class="column" id="new-vocab">
+          <h2>Mới học</h2>
+          <p id="new-count">0 từ</p>
+          <button onclick="openFlashcard()">Xem Flashcard</button>
+        </div>
+        <div class="column" id="learning-vocab">
+          <h2>Đang học</h2>
+          <p id="learning-count">0 từ</p>
+        </div>
+        <div class="column" id="learned-vocab">
+          <h2>Đã học</h2>
+          <p id="learned-count">0 từ</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trang Flashcard -->
+    <div class="flashcard-container" id="flashcard-page" style="display: none">
+      <h1>Flashcard</h1>
+      <div class="flashcard" id="flashcard">
+        <div class="front">
+          <p id="vocab-word">Từ vựng</p>
+        </div>
+        <div class="back">
+          <p id="vocab-meaning">Nghĩa từ vựng</p>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button onclick="markLearned()">Đã thuộc</button>
+        <button onclick="markLearning()">Đang học</button>
+      </div>
+
+      <button class="back-button" onclick="goBack()">Quay lại</button>
+    </div>
+
+    <script>
+      let vocabList = JSON.parse(localStorage.getItem("vocabList")) || [];
+      let learningVocab =
+        JSON.parse(localStorage.getItem("learningVocab")) || [];
+      let learnedVocab = JSON.parse(localStorage.getItem("learnedVocab")) || [];
+
+      function addVocabulary() {
+        let vocabInput = document.getElementById("vocab-input");
+        let meaningInput = document.getElementById("meaning-input");
+        let newWord = vocabInput.value.trim();
+        let meaning = meaningInput.value.trim();
+
+        if (newWord && meaning) {
+          vocabList.push({ word: newWord, meaning: meaning });
+          updateVocabularyLists();
+          vocabInput.value = "";
+          meaningInput.value = "";
+        }
+      }
+
+      function updateVocabularyLists() {
+        document.getElementById(
+          "new-count"
+        ).textContent = `${vocabList.length} từ`;
+        document.getElementById(
+          "learning-count"
+        ).textContent = `${learningVocab.length} từ`;
+        document.getElementById(
+          "learned-count"
+        ).textContent = `${learnedVocab.length} từ`;
+
+        localStorage.setItem("vocabList", JSON.stringify(vocabList));
+        localStorage.setItem("learningVocab", JSON.stringify(learningVocab));
+        localStorage.setItem("learnedVocab", JSON.stringify(learnedVocab));
+      }
+
+      function openFlashcard() {
+        if (vocabList.length > 0) {
+          document.getElementById("main-page").style.display = "none";
+          document.getElementById("flashcard-page").style.display = "block";
+          showFlashcard();
+        }
+      }
+
+      function showFlashcard() {
+        let currentVocab = vocabList[0];
+        document.getElementById("vocab-word").textContent = currentVocab.word;
+        document.getElementById("vocab-meaning").textContent =
+          currentVocab.meaning;
+
+        let flashcard = document.getElementById("flashcard");
+        flashcard.classList.add("show-front");
+        flashcard.classList.remove("show-back");
+
+        flashcard.onclick = function () {
+          if (flashcard.classList.contains("show-front")) {
+            flashcard.classList.remove("show-front");
+            flashcard.classList.add("show-back");
+          } else {
+            flashcard.classList.remove("show-back");
+            flashcard.classList.add("show-front");
+          }
+        };
+      }
+
+      function markLearned() {
+        let currentVocab = vocabList.shift();
+        learnedVocab.push(currentVocab);
+        updateVocabularyLists();
+        goBack();
+      }
+
+      function markLearning() {
+        let currentVocab = vocabList.shift();
+        learningVocab.push(currentVocab);
+        updateVocabularyLists();
+        goBack();
+      }
+
+      function goBack() {
+        document.getElementById("main-page").style.display = "block";
+        document.getElementById("flashcard-page").style.display = "none";
+      }
+
+      updateVocabularyLists();
+    </script>
+  </body>
+</html>
