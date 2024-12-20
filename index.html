@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>test</title>
+    <title>Flashcard System</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -152,15 +152,17 @@
         <div class="column" id="new-vocab">
           <h2>Mới học</h2>
           <p id="new-count">0 từ</p>
-          <button onclick="openFlashcard()">Xem Flashcard</button>
+          <button onclick="openFlashcard('new')">Xem Flashcard</button>
         </div>
         <div class="column" id="learning-vocab">
           <h2>Đang học</h2>
           <p id="learning-count">0 từ</p>
+          <button onclick="openFlashcard('learning')">Xem Flashcard</button>
         </div>
         <div class="column" id="learned-vocab">
           <h2>Đã học</h2>
           <p id="learned-count">0 từ</p>
+          <button onclick="viewLearnedWords()">Xem danh sách</button>
         </div>
       </div>
     </div>
@@ -180,8 +182,17 @@
       <div class="buttons">
         <button onclick="markLearned()">Đã thuộc</button>
         <button onclick="markLearning()">Đang học</button>
+        <button onclick="prevFlashcard()">Thẻ trước</button>
+        <button onclick="nextFlashcard()">Thẻ kế tiếp</button>
       </div>
 
+      <button class="back-button" onclick="goBack()">Quay lại</button>
+    </div>
+
+    <!-- Trang danh sách đã học -->
+    <div class="container" id="learned-page" style="display: none">
+      <h1>Danh sách từ đã học</h1>
+      <ul id="learned-list"></ul>
       <button class="back-button" onclick="goBack()">Quay lại</button>
     </div>
 
@@ -190,6 +201,8 @@
       let learningVocab =
         JSON.parse(localStorage.getItem("learningVocab")) || [];
       let learnedVocab = JSON.parse(localStorage.getItem("learnedVocab")) || [];
+      let currentIndex = 0;
+      let currentType = "new";
 
       function addVocabulary() {
         let vocabInput = document.getElementById("vocab-input");
@@ -221,52 +234,118 @@
         localStorage.setItem("learnedVocab", JSON.stringify(learnedVocab));
       }
 
-      function openFlashcard() {
-        if (vocabList.length > 0) {
+      function openFlashcard(type) {
+        currentType = type;
+        let flashcards = getFlashcardsByType(type);
+
+        if (flashcards.length > 0) {
+          currentIndex = 0;
           document.getElementById("main-page").style.display = "none";
           document.getElementById("flashcard-page").style.display = "block";
           showFlashcard();
         }
       }
 
+      function getFlashcardsByType(type) {
+        if (type === "new") return vocabList;
+        if (type === "learning") return learningVocab;
+        return [];
+      }
+
       function showFlashcard() {
-        let currentVocab = vocabList[0];
-        document.getElementById("vocab-word").textContent = currentVocab.word;
-        document.getElementById("vocab-meaning").textContent =
-          currentVocab.meaning;
+        let flashcards = getFlashcardsByType(currentType);
+        if (flashcards.length > 0 && currentIndex < flashcards.length) {
+          let currentVocab = flashcards[currentIndex];
+          document.getElementById("vocab-word").textContent = currentVocab.word;
+          document.getElementById("vocab-meaning").textContent =
+            currentVocab.meaning;
 
-        let flashcard = document.getElementById("flashcard");
-        flashcard.classList.add("show-front");
-        flashcard.classList.remove("show-back");
+          let flashcard = document.getElementById("flashcard");
+          flashcard.classList.add("show-front");
+          flashcard.classList.remove("show-back");
 
-        flashcard.onclick = function () {
-          if (flashcard.classList.contains("show-front")) {
-            flashcard.classList.remove("show-front");
-            flashcard.classList.add("show-back");
-          } else {
-            flashcard.classList.remove("show-back");
-            flashcard.classList.add("show-front");
-          }
-        };
+          flashcard.onclick = function () {
+            if (flashcard.classList.contains("show-front")) {
+              flashcard.classList.remove("show-front");
+              flashcard.classList.add("show-back");
+            } else {
+              flashcard.classList.remove("show-back");
+              flashcard.classList.add("show-front");
+            }
+          };
+        }
+      }
+
+      function nextFlashcard() {
+        let flashcards = getFlashcardsByType(currentType);
+        if (currentIndex < flashcards.length - 1) {
+          currentIndex++;
+          showFlashcard();
+        } else {
+          alert("Đã hết flashcard.");
+        }
+      }
+
+      function prevFlashcard() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          showFlashcard();
+        } else {
+          alert("Đây là thẻ đầu tiên.");
+        }
       }
 
       function markLearned() {
-        let currentVocab = vocabList.shift();
-        learnedVocab.push(currentVocab);
+        if (currentType === "learning") {
+          let currentVocab = learningVocab.splice(currentIndex, 1)[0];
+          learnedVocab.push(currentVocab);
+        } else if (currentType === "new") {
+          let currentVocab = vocabList.splice(currentIndex, 1)[0];
+          learnedVocab.push(currentVocab);
+        }
         updateVocabularyLists();
-        goBack();
+        adjustIndexAndShowNext();
       }
 
       function markLearning() {
-        let currentVocab = vocabList.shift();
-        learningVocab.push(currentVocab);
-        updateVocabularyLists();
-        goBack();
+        if (currentType === "new") {
+          let currentVocab = vocabList.splice(currentIndex, 1)[0];
+          learningVocab.push(currentVocab);
+          updateVocabularyLists();
+          adjustIndexAndShowNext();
+        }
+      }
+
+      function adjustIndexAndShowNext() {
+        let flashcards = getFlashcardsByType(currentType);
+        if (currentIndex >= flashcards.length) {
+          currentIndex = flashcards.length - 1;
+        }
+        if (flashcards.length > 0) {
+          showFlashcard();
+        } else {
+          goBack();
+        }
+      }
+
+      function viewLearnedWords() {
+        document.getElementById("main-page").style.display = "none";
+        document.getElementById("learned-page").style.display = "block";
+
+        let learnedList = document.getElementById("learned-list");
+        learnedList.innerHTML = "";
+
+        learnedVocab.forEach((item) => {
+          let li = document.createElement("li");
+          li.textContent = `${item.word}: ${item.meaning}`;
+          learnedList.appendChild(li);
+        });
       }
 
       function goBack() {
         document.getElementById("main-page").style.display = "block";
         document.getElementById("flashcard-page").style.display = "none";
+        document.getElementById("learned-page").style.display = "none";
       }
 
       updateVocabularyLists();
