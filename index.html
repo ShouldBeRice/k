@@ -133,12 +133,42 @@
       .back-button:hover {
         background-color: #ff3300;
       }
+
+      .matching-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .matching-item {
+        width: 45%;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .selected {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .match-button {
+        margin-top: 20px;
+      }
+      .play {
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
     <!-- Trang chính -->
     <div class="container" id="main-page">
       <h1>Học Lặp Lại Ngắt Quãng</h1>
+      <button id="reset-button" onclick="resetApplication()">Reset</button>
 
       <input type="text" id="vocab-input" placeholder="Nhập từ vựng..." />
       <input
@@ -163,8 +193,16 @@
           <h2>Đã học</h2>
           <p id="learned-count">0 từ</p>
           <button onclick="viewLearnedWords()">Xem danh sách</button>
+          <button class="play" onclick="startMatching()">Chơi Matching</button>
         </div>
       </div>
+    </div>
+
+    <!-- Trang Matching -->
+    <div class="container" id="matching-page" style="display: none">
+      <h1>Matching</h1>
+      <div class="matching-container" id="matching-container"></div>
+      <button class="back-button" onclick="goBack()">Quay lại</button>
     </div>
 
     <!-- Trang Flashcard -->
@@ -346,9 +384,109 @@
         document.getElementById("main-page").style.display = "block";
         document.getElementById("flashcard-page").style.display = "none";
         document.getElementById("learned-page").style.display = "none";
+        document.getElementById("matching-page").style.display = "none";
       }
 
-      updateVocabularyLists();
+      function startMatching() {
+        document.getElementById("main-page").style.display = "none";
+        document.getElementById("matching-page").style.display = "block";
+        generateMatchingGame();
+      }
+
+      function generateMatchingGame() {
+        let matchingContainer = document.getElementById("matching-container");
+        matchingContainer.innerHTML = "";
+
+        let allWords = [...learnedVocab];
+        let shuffled = allWords.sort(() => Math.random() - 0.5);
+        let words = shuffled.map((item) => ({ type: "word", text: item.word }));
+        let meanings = shuffled.map((item) => ({
+          type: "meaning",
+          text: item.meaning,
+        }));
+
+        let items = [...words, ...meanings].sort(() => Math.random() - 0.5);
+        let selectedItems = [];
+
+        items.forEach((item) => {
+          let div = document.createElement("div");
+          div.className = "matching-item";
+          div.textContent = item.text;
+          div.dataset.type = item.type;
+          div.dataset.text = item.text;
+
+          div.addEventListener("click", () => {
+            if (
+              selectedItems.length < 2 &&
+              !div.classList.contains("selected")
+            ) {
+              div.classList.add("selected");
+              selectedItems.push(div);
+
+              if (selectedItems.length === 2) {
+                checkMatch(selectedItems);
+              }
+            }
+          });
+
+          matchingContainer.appendChild(div);
+        });
+      }
+
+      function checkMatch(selectedItems) {
+        let [first, second] = selectedItems;
+
+        let firstText = first.dataset.text;
+        let secondText = second.dataset.text;
+
+        let match = false;
+        for (let vocab of learnedVocab) {
+          if (
+            (firstText === vocab.word && secondText === vocab.meaning) ||
+            (firstText === vocab.meaning && secondText === vocab.word)
+          ) {
+            match = true;
+            break;
+          }
+        }
+
+        if (match) {
+          first.style.backgroundColor = "#4caf50";
+          second.style.backgroundColor = "#4caf50";
+          setTimeout(() => {
+            first.style.visibility = "hidden";
+            second.style.visibility = "hidden";
+          }, 1000);
+        } else {
+          first.style.backgroundColor = "#ff5733";
+          second.style.backgroundColor = "#ff5733";
+          setTimeout(() => {
+            first.classList.remove("selected");
+            second.classList.remove("selected");
+            first.style.backgroundColor = "#e0e0e0";
+            second.style.backgroundColor = "#e0e0e0";
+          }, 1000);
+        }
+
+        setTimeout(() => {
+          selectedItems.length = 0;
+        }, 1000);
+      }
+
+      function resetApplication() {
+        if (confirm("Bạn có chắc muốn đặt lại toàn bộ dữ liệu không?")) {
+          vocabList = [];
+          learningVocab = [];
+          learnedVocab = [];
+          updateVocabularyLists();
+          alert("Dữ liệu đã được đặt lại!");
+        }
+      }
+
+      function endGame() {
+        alert("Kết thúc trò chơi! Bạn đã hoàn thành bài luyện tập.");
+        goBack();
+      }
     </script>
   </body>
 </html>
