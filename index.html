@@ -234,5 +234,18 @@
     </div>
 
     <script src="haha.js"></script>
+    <script>
+    // Vô hiệu hóa chuột phải
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Vô hiệu hóa phím tắt F12, Ctrl+Shift+I, Ctrl+U
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'F12' || (e.ctrlKey && (e.key === 'u' || e.key === 'U')) || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I'))) {
+            e.preventDefault();
+        }
+    });
+</script>
+
   </body>
 </html>
