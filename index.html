@@ -164,14 +164,6 @@
     </style>
   </head>
   <body>
-    <div>
-      <h3>Đặt lịch gửi thông báo</h3>
-      <input id="notification-title" placeholder="Tiêu đề thông báo" />
-      <input id="notification-body" placeholder="Nội dung thông báo" />
-      <input id="notification-token" placeholder="Token người nhận" />
-      <input id="notification-time" type="datetime-local" />
-      <button onclick="scheduleNotification()">Đặt lịch</button>
-    </div>
     <!-- Trang chính -->
     <div class="container" id="main-page">
       <h1>Học Lặp Lại Ngắt Quãng</h1>
@@ -242,92 +234,5 @@
     </div>
 
     <script src="haha.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js"></script>
-
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("./firebase-messaging-sw.js")
-          .then((registration) => {
-            console.log("Service Worker đăng ký thành công:", registration);
-          })
-          .catch((error) => {
-            console.error("Đăng ký Service Worker thất bại:", error);
-          });
-      }
-    </script>
-
-    <script type="module">
-      import { initializeApp } from "firebase/app";
-      import { getMessaging, getToken, onMessage } from "firebase/messaging";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyCIAEvk6L9v5dHyec3Y-HqeERqZicXTIpg",
-        authDomain: "mynotificationproject-73ac9.firebaseapp.com",
-        projectId: "mynotificationproject-73ac9",
-        storageBucket: "mynotificationproject-73ac9.firebasestorage.app",
-        messagingSenderId: "926597572713",
-        appId: "1:926597572713:web:200ba3817f484562805af8",
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const messaging = getMessaging(app);
-
-      const requestPermission = async () => {
-        try {
-          const token = await getToken(messaging, {
-            vapidKey:
-              "BHm4KpK7l2sYVeDQ5Iv5nXyv7Dw2KiMZiukkxUFG4LMvufhHGJQwOxz8x2qraHPcSa6nVBK2KPAQr1uG4r5Ush8",
-          });
-          if (token) {
-            console.log("Token nhận được:", token);
-          } else {
-            console.log("Không thể nhận token.");
-          }
-        } catch (error) {
-          console.error("Lỗi khi yêu cầu quyền:", error);
-        }
-      };
-
-      onMessage(messaging, (payload) => {
-        console.log("Thông báo nhận được: ", payload);
-        alert(`Notification: ${payload.notification.title}`);
-      });
-
-      requestPermission();
-    </script>
-
-    <script>
-      function scheduleNotification() {
-        const title = document.getElementById("notification-title").value;
-        const body = document.getElementById("notification-body").value;
-        const time = document.getElementById("notification-time").value;
-
-        if (!title || !body || !time) {
-          alert("Vui lòng điền đầy đủ thông tin!");
-          return;
-        }
-
-        const delay = new Date(time) - new Date(); // Tính thời gian chờ
-
-        if (delay < 0) {
-          alert("Thời gian phải ở tương lai!");
-          return;
-        }
-
-        if (navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
-            type: "scheduleNotification",
-            title: title,
-            body: body,
-            delay: delay,
-          });
-          alert("Đã đặt lịch gửi thông báo!");
-        } else {
-          alert("Service Worker chưa được kích hoạt.");
-        }
-      }
-    </script>
   </body>
 </html>
