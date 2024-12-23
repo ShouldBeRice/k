@@ -22,3 +22,12 @@ messaging.onBackgroundMessage((payload) => {
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
+self.addEventListener('message', (event) => {
+    if (event.data.type === 'scheduleNotification') {
+        const { title, body, delay } = event.data;
+
+        setTimeout(() => {
+            self.registration.showNotification(title, { body });
+        }, delay);
+    }
+});
