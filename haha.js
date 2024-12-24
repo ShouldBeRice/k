@@ -1,9 +1,7 @@
-// Khởi tạo danh sách từ vựng từ localStorage
 let vocabList = JSON.parse(localStorage.getItem("vocabList")) || [];
 let learningVocab = JSON.parse(localStorage.getItem("learningVocab")) || [];
 let learnedVocab = JSON.parse(localStorage.getItem("learnedVocab")) || [];
 
-// Cập nhật số từ trong các danh sách khi khởi động
 document.getElementById("new-count").textContent = `${vocabList.length} từ`;
 document.getElementById(
   "learning-count"
@@ -12,10 +10,8 @@ document.getElementById(
   "learned-count"
 ).textContent = `${learnedVocab.length} từ`;
 
-// Đảm bảo giao diện được cập nhật
 updateVocabularyLists();
 
-// Thêm từ vựng mới
 function addVocabulary() {
   let vocabInput = document.getElementById("vocab-input");
   let meaningInput = document.getElementById("meaning-input");
@@ -30,7 +26,6 @@ function addVocabulary() {
   }
 }
 
-// Cập nhật danh sách từ vựng và lưu vào localStorage
 function updateVocabularyLists() {
   document.getElementById("new-count").textContent = `${vocabList.length} từ`;
   document.getElementById(
@@ -44,13 +39,11 @@ function updateVocabularyLists() {
   localStorage.setItem("learningVocab", JSON.stringify(learningVocab));
   localStorage.setItem("learnedVocab", JSON.stringify(learnedVocab));
 
-  // Cập nhật biểu đồ ngay lập tức nếu giao diện thống kê đang hiển thị
   if (document.getElementById("stats-page").style.display === "block") {
-    showStatistics(); // Cập nhật dữ liệu biểu đồ
+    showStatistics();
   }
 }
 
-// Mở flashcard theo loại từ vựng
 function openFlashcard(type) {
   currentType = type;
   let flashcards = getFlashcardsByType(type);
@@ -63,14 +56,12 @@ function openFlashcard(type) {
   }
 }
 
-// Lấy danh sách từ vựng theo loại
 function getFlashcardsByType(type) {
   if (type === "new") return vocabList;
   if (type === "learning") return learningVocab;
   return [];
 }
 
-// Hiển thị flashcard hiện tại
 function showFlashcard() {
   let flashcards = getFlashcardsByType(currentType);
   if (flashcards.length > 0 && currentIndex < flashcards.length) {
@@ -94,7 +85,6 @@ function showFlashcard() {
   }
 }
 
-// Chuyển flashcard tiếp theo
 function nextFlashcard() {
   let flashcards = getFlashcardsByType(currentType);
   if (currentIndex < flashcards.length - 1) {
@@ -105,7 +95,6 @@ function nextFlashcard() {
   }
 }
 
-// Quay lại flashcard trước
 function prevFlashcard() {
   if (currentIndex > 0) {
     currentIndex--;
@@ -115,7 +104,6 @@ function prevFlashcard() {
   }
 }
 
-// Đánh dấu từ đã học
 function markLearned() {
   if (currentType === "learning") {
     let currentVocab = learningVocab.splice(currentIndex, 1)[0];
@@ -128,7 +116,6 @@ function markLearned() {
   adjustIndexAndShowNext();
 }
 
-// Đánh dấu từ đang học
 function markLearning() {
   if (currentType === "new") {
     let currentVocab = vocabList.splice(currentIndex, 1)[0];
@@ -138,7 +125,6 @@ function markLearning() {
   }
 }
 
-// Điều chỉnh chỉ mục và hiển thị flashcard tiếp theo
 function adjustIndexAndShowNext() {
   let flashcards = getFlashcardsByType(currentType);
   if (currentIndex >= flashcards.length) {
@@ -151,7 +137,6 @@ function adjustIndexAndShowNext() {
   }
 }
 
-// Xem danh sách từ đã học
 function viewLearnedWords() {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("learned-page").style.display = "block";
@@ -166,7 +151,6 @@ function viewLearnedWords() {
   });
 }
 
-// Quay lại giao diện chính
 function goBack() {
   document.getElementById("main-page").style.display = "block";
   document.getElementById("flashcard-page").style.display = "none";
@@ -175,14 +159,12 @@ function goBack() {
   document.getElementById("stats-page").style.display = "none";
 }
 
-// Bắt đầu trò chơi ghép nối
 function startMatching() {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("matching-page").style.display = "block";
   generateMatchingGame();
 }
 
-// Tạo trò chơi ghép nối
 function generateMatchingGame() {
   let matchingContainer = document.getElementById("matching-container");
   matchingContainer.innerHTML = "";
@@ -220,7 +202,6 @@ function generateMatchingGame() {
   });
 }
 
-// Kiểm tra kết quả ghép nối
 function checkMatch(selectedItems) {
   let [first, second] = selectedItems;
 
@@ -261,7 +242,6 @@ function checkMatch(selectedItems) {
   }, 1000);
 }
 
-// Đặt lại ứng dụng
 function resetApplication() {
   if (confirm("Bạn có chắc muốn đặt lại toàn bộ dữ liệu không?")) {
     vocabList = [];
@@ -272,14 +252,12 @@ function resetApplication() {
   }
 }
 
-// Kết thúc trò chơi
 function endGame() {
   alert("Kết thúc trò chơi! Bạn đã hoàn thành bài luyện tập.");
   goBack();
 }
-let progressChart; // Biến lưu biểu đồ toàn cục
+let progressChart;
 
-// Hiển thị thống kê tiến độ học tập
 function showStatistics() {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("stats-page").style.display = "block";
@@ -298,14 +276,13 @@ function showStatistics() {
     ],
   };
 
-  // Nếu biểu đồ đã tồn tại, cập nhật dữ liệu thay vì tạo lại
   if (progressChart) {
     progressChart.data.datasets[0].data = [
       vocabList.length,
       learningVocab.length,
       learnedVocab.length,
     ];
-    progressChart.update(); // Cập nhật biểu đồ
+    progressChart.update();
   } else {
     const config = {
       type: "pie",
@@ -327,6 +304,6 @@ function showStatistics() {
       },
     };
 
-    progressChart = new Chart(ctx, config); // Lưu biểu đồ vào biến toàn cục
+    progressChart = new Chart(ctx, config);
   }
 }
