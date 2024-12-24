@@ -13,10 +13,10 @@ document.getElementById(
 updateVocabularyLists();
 
 function addVocabulary() {
-  let vocabInput = document.getElementById("vocab-input");
-  let meaningInput = document.getElementById("meaning-input");
-  let newWord = vocabInput.value.trim();
-  let meaning = meaningInput.value.trim();
+  const vocabInput = document.getElementById("vocab-input");
+  const meaningInput = document.getElementById("meaning-input");
+  const newWord = vocabInput.value.trim();
+  const meaning = meaningInput.value.trim();
 
   if (newWord && meaning) {
     vocabList.push({ word: newWord, meaning: meaning });
@@ -46,7 +46,7 @@ function updateVocabularyLists() {
 
 function openFlashcard(type) {
   currentType = type;
-  let flashcards = getFlashcardsByType(type);
+  const flashcards = getFlashcardsByType(type);
 
   if (flashcards.length > 0) {
     currentIndex = 0;
@@ -63,30 +63,25 @@ function getFlashcardsByType(type) {
 }
 
 function showFlashcard() {
-  let flashcards = getFlashcardsByType(currentType);
+  const flashcards = getFlashcardsByType(currentType);
   if (flashcards.length > 0 && currentIndex < flashcards.length) {
-    let currentVocab = flashcards[currentIndex];
+    const currentVocab = flashcards[currentIndex];
     document.getElementById("vocab-word").textContent = currentVocab.word;
     document.getElementById("vocab-meaning").textContent = currentVocab.meaning;
 
-    let flashcard = document.getElementById("flashcard");
+    const flashcard = document.getElementById("flashcard");
     flashcard.classList.add("show-front");
     flashcard.classList.remove("show-back");
 
-    flashcard.onclick = function () {
-      if (flashcard.classList.contains("show-front")) {
-        flashcard.classList.remove("show-front");
-        flashcard.classList.add("show-back");
-      } else {
-        flashcard.classList.remove("show-back");
-        flashcard.classList.add("show-front");
-      }
+    flashcard.onclick = () => {
+      flashcard.classList.toggle("show-front");
+      flashcard.classList.toggle("show-back");
     };
   }
 }
 
 function nextFlashcard() {
-  let flashcards = getFlashcardsByType(currentType);
+  const flashcards = getFlashcardsByType(currentType);
   if (currentIndex < flashcards.length - 1) {
     currentIndex++;
     showFlashcard();
@@ -106,10 +101,10 @@ function prevFlashcard() {
 
 function markLearned() {
   if (currentType === "learning") {
-    let currentVocab = learningVocab.splice(currentIndex, 1)[0];
+    const currentVocab = learningVocab.splice(currentIndex, 1)[0];
     learnedVocab.push(currentVocab);
   } else if (currentType === "new") {
-    let currentVocab = vocabList.splice(currentIndex, 1)[0];
+    const currentVocab = vocabList.splice(currentIndex, 1)[0];
     learnedVocab.push(currentVocab);
   }
   updateVocabularyLists();
@@ -118,7 +113,7 @@ function markLearned() {
 
 function markLearning() {
   if (currentType === "new") {
-    let currentVocab = vocabList.splice(currentIndex, 1)[0];
+    const currentVocab = vocabList.splice(currentIndex, 1)[0];
     learningVocab.push(currentVocab);
     updateVocabularyLists();
     adjustIndexAndShowNext();
@@ -126,7 +121,7 @@ function markLearning() {
 }
 
 function adjustIndexAndShowNext() {
-  let flashcards = getFlashcardsByType(currentType);
+  const flashcards = getFlashcardsByType(currentType);
   if (currentIndex >= flashcards.length) {
     currentIndex = flashcards.length - 1;
   }
@@ -141,11 +136,11 @@ function viewLearnedWords() {
   document.getElementById("main-page").style.display = "none";
   document.getElementById("learned-page").style.display = "block";
 
-  let learnedList = document.getElementById("learned-list");
+  const learnedList = document.getElementById("learned-list");
   learnedList.innerHTML = "";
 
   learnedVocab.forEach((item) => {
-    let li = document.createElement("li");
+    const li = document.createElement("li");
     li.textContent = `${item.word}: ${item.meaning}`;
     learnedList.appendChild(li);
   });
@@ -157,6 +152,7 @@ function goBack() {
   document.getElementById("learned-page").style.display = "none";
   document.getElementById("matching-page").style.display = "none";
   document.getElementById("stats-page").style.display = "none";
+  document.getElementById("learned-scramble-page").style.display = "none";
 }
 
 function startMatching() {
@@ -166,22 +162,22 @@ function startMatching() {
 }
 
 function generateMatchingGame() {
-  let matchingContainer = document.getElementById("matching-container");
+  const matchingContainer = document.getElementById("matching-container");
   matchingContainer.innerHTML = "";
 
-  let allWords = [...learnedVocab];
-  let shuffled = allWords.sort(() => Math.random() - 0.5);
-  let words = shuffled.map((item) => ({ type: "word", text: item.word }));
-  let meanings = shuffled.map((item) => ({
+  const allWords = [...learnedVocab];
+  const shuffled = allWords.sort(() => Math.random() - 0.5);
+  const words = shuffled.map((item) => ({ type: "word", text: item.word }));
+  const meanings = shuffled.map((item) => ({
     type: "meaning",
     text: item.meaning,
   }));
 
-  let items = [...words, ...meanings].sort(() => Math.random() - 0.5);
-  let selectedItems = [];
+  const items = [...words, ...meanings].sort(() => Math.random() - 0.5);
+  const selectedItems = [];
 
   items.forEach((item) => {
-    let div = document.createElement("div");
+    const div = document.createElement("div");
     div.className = "matching-item";
     div.textContent = item.text;
     div.dataset.type = item.type;
@@ -203,13 +199,13 @@ function generateMatchingGame() {
 }
 
 function checkMatch(selectedItems) {
-  let [first, second] = selectedItems;
+  const [first, second] = selectedItems;
 
-  let firstText = first.dataset.text;
-  let secondText = second.dataset.text;
+  const firstText = first.dataset.text;
+  const secondText = second.dataset.text;
 
   let match = false;
-  for (let vocab of learnedVocab) {
+  for (const vocab of learnedVocab) {
     if (
       (firstText === vocab.word && secondText === vocab.meaning) ||
       (firstText === vocab.meaning && secondText === vocab.word)
@@ -295,9 +291,7 @@ function showStatistics() {
           },
           tooltip: {
             callbacks: {
-              label: function (context) {
-                return `${context.label}: ${context.raw} từ`;
-              },
+              label: (context) => `${context.label}: ${context.raw} từ`,
             },
           },
         },
@@ -306,4 +300,67 @@ function showStatistics() {
 
     progressChart = new Chart(ctx, config);
   }
+}
+
+function startScramblePractice() {
+  document.getElementById("main-page").style.display = "none";
+  document.getElementById("learned-scramble-page").style.display = "block";
+  generateLearnedScrambledWords();
+}
+
+function generateLearnedScrambledWords() {
+  const container = document.getElementById("scrambled-words-container");
+  container.innerHTML = ""; // Xóa nội dung cũ
+
+  if (learnedVocab.length > 0) {
+    // Xáo trộn từ vựng đã học mỗi lần vào trang
+    const shuffledLearnedVocab = learnedVocab.sort(() => Math.random() - 0.5);
+
+    shuffledLearnedVocab.forEach((vocab, index) => {
+      const scrambledWord = scrambleWord(vocab.word);
+
+ 
+      const wordDiv = document.createElement("div");
+      wordDiv.textContent = `Từ xáo trộn: ${scrambledWord}`;
+      container.appendChild(wordDiv);
+
+   
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = `unscrambled-input-${index}`;
+      input.dataset.originalWord = vocab.word;
+      container.appendChild(input);
+    });
+  }
+}
+
+function scrambleWord(word) {
+  const wordArray = word.split("");
+  for (let i = wordArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [wordArray[i], wordArray[j]] = [wordArray[j], wordArray[i]];
+  }
+  return wordArray.join("");
+}
+
+function checkAllUnscrambledWords() {
+  const resultDiv = document.getElementById("scramble-result");
+  resultDiv.innerHTML = ""; // Xóa kết quả cũ
+
+  learnedVocab.forEach((vocab, index) => {
+    const input = document.getElementById(`unscrambled-input-${index}`);
+    const userWord = input.value.trim();
+
+    if (userWord === vocab.word) {
+      const correctDiv = document.createElement("div");
+      correctDiv.textContent = `Từ "${vocab.word}" nhập đúng!`;
+      correctDiv.style.color = "green";
+      resultDiv.appendChild(correctDiv);
+    } else {
+      const wrongDiv = document.createElement("div");
+      wrongDiv.textContent = `Từ "${vocab.word}" nhập sai!`;
+      wrongDiv.style.color = "red";
+      resultDiv.appendChild(wrongDiv);
+    }
+  });
 }
