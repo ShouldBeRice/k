@@ -8,6 +8,7 @@
       body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
+
         justify-content: center;
         align-items: center;
         height: 100vh;
@@ -164,88 +165,93 @@
     </style>
   </head>
   <body>
-    <!-- Trang chính -->
-    <div class="container" id="main-page">
-      <h1>Học Lặp Lại Ngắt Quãng</h1>
-      <button id="reset-button" onclick="resetApplication()">Reset</button>
+    <div>
+      <!-- Trang chính -->
+      <div class="container" id="main-page">
+        <h1>Học Lặp Lại Ngắt Quãng</h1>
+        <button id="reset-button" onclick="resetApplication()">Reset</button>
 
-      <input type="text" id="vocab-input" placeholder="Nhập từ vựng..." />
-      <input
-        type="text"
-        id="meaning-input"
-        placeholder="Nhập nghĩa từ vựng..."
-      />
-      <button onclick="addVocabulary()">Thêm từ vựng</button>
+        <input type="text" id="vocab-input" placeholder="Nhập từ vựng..." />
+        <input
+          type="text"
+          id="meaning-input"
+          placeholder="Nhập nghĩa từ vựng..."
+        />
+        <button onclick="addVocabulary()">Thêm từ vựng</button>
 
-      <div class="columns">
-        <div class="column" id="new-vocab">
-          <h2>Mới học</h2>
-          <p id="new-count">0 từ</p>
-          <button onclick="openFlashcard('new')">Xem Flashcard</button>
-        </div>
-        <div class="column" id="learning-vocab">
-          <h2>Đang học</h2>
-          <p id="learning-count">0 từ</p>
-          <button onclick="openFlashcard('learning')">Xem Flashcard</button>
-        </div>
-        <div class="column" id="learned-vocab">
-          <h2>Đã học</h2>
-          <p id="learned-count">0 từ</p>
-          <button onclick="viewLearnedWords()">Xem danh sách</button>
-          <button class="play" onclick="startMatching()">Chơi Matching</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Trang Matching -->
-    <div class="container" id="matching-page" style="display: none">
-      <h1>Matching</h1>
-      <div class="matching-container" id="matching-container"></div>
-      <button class="back-button" onclick="goBack()">Quay lại</button>
-    </div>
-
-    <!-- Trang Flashcard -->
-    <div class="flashcard-container" id="flashcard-page" style="display: none">
-      <h1>Flashcard</h1>
-      <div class="flashcard" id="flashcard">
-        <div class="front">
-          <p id="vocab-word">Từ vựng</p>
-        </div>
-        <div class="back">
-          <p id="vocab-meaning">Nghĩa từ vựng</p>
+        <div class="columns">
+          <div class="column" id="new-vocab">
+            <h2>Mới học</h2>
+            <p id="new-count">0 từ</p>
+            <button onclick="openFlashcard('new')">Xem Flashcard</button>
+          </div>
+          <div class="column" id="learning-vocab">
+            <h2>Đang học</h2>
+            <p id="learning-count">0 từ</p>
+            <button onclick="openFlashcard('learning')">Xem Flashcard</button>
+          </div>
+          <div class="column" id="learned-vocab">
+            <h2>Đã học</h2>
+            <p id="learned-count">0 từ</p>
+            <button onclick="viewLearnedWords()">Xem danh sách</button>
+            <button class="play" onclick="startMatching()">
+              Chơi Matching
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="buttons">
-        <button onclick="markLearned()">Đã thuộc</button>
-        <button onclick="markLearning()">Đang học</button>
-        <button onclick="prevFlashcard()">Thẻ trước</button>
-        <button onclick="nextFlashcard()">Thẻ kế tiếp</button>
+      <!-- Trang Matching -->
+      <div class="container" id="matching-page" style="display: none">
+        <h1>Matching</h1>
+        <div class="matching-container" id="matching-container"></div>
+        <button class="back-button" onclick="goBack()">Quay lại</button>
       </div>
 
-      <button class="back-button" onclick="goBack()">Quay lại</button>
+      <!-- Trang Flashcard -->
+      <div
+        class="flashcard-container"
+        id="flashcard-page"
+        style="display: none"
+      >
+        <h1>Flashcard</h1>
+        <div class="flashcard" id="flashcard">
+          <div class="front">
+            <p id="vocab-word">Từ vựng</p>
+          </div>
+          <div class="back">
+            <p id="vocab-meaning">Nghĩa từ vựng</p>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button onclick="markLearned()">Đã thuộc</button>
+          <button onclick="markLearning()">Đang học</button>
+          <button onclick="prevFlashcard()">Thẻ trước</button>
+          <button onclick="nextFlashcard()">Thẻ kế tiếp</button>
+        </div>
+
+        <button class="back-button" onclick="goBack()">Quay lại</button>
+      </div>
+
+      <!-- Trang danh sách đã học -->
+      <div class="container" id="learned-page" style="display: none">
+        <h1>Danh sách từ đã học</h1>
+        <ul id="learned-list"></ul>
+        <button class="back-button" onclick="goBack()">Quay lại</button>
+      </div>
     </div>
 
-    <!-- Trang danh sách đã học -->
-    <div class="container" id="learned-page" style="display: none">
-      <h1>Danh sách từ đã học</h1>
-      <ul id="learned-list"></ul>
-      <button class="back-button" onclick="goBack()">Quay lại</button>
+    <!-- Nút xem thống kê trên giao diện chính -->
+    <button onclick="showStatistics()">Xem thống kê</button>
+
+    <!-- Trang hiển thị thống kê -->
+    <div id="stats-page" style="display: none">
+      <button onclick="goBack()">Quay lại</button>
+      <canvas id="progressChart" width="400" height="400"></canvas>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="haha.js"></script>
-    <script>
-    // Vô hiệu hóa chuột phải
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    // Vô hiệu hóa phím tắt F12, Ctrl+Shift+I, Ctrl+U
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && (e.key === 'u' || e.key === 'U')) || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I'))) {
-            e.preventDefault();
-        }
-    });
-</script>
-
   </body>
 </html>
